@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.CircularProgressIndicator
 
 private val CardDark = Color(0xFF2B2420)
 private val Green = Color(0xFF4CAF50)
@@ -46,6 +47,17 @@ fun GameScreen(
             GameStatus.DEFEAT -> onFinish(false)
             else -> {}
         }
+    }
+
+    // Mientras se cargan las preguntas de la base de datos
+    if (viewModel.status == GameStatus.LOADING) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
     }
 
     val question = viewModel.currentQuestion
