@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -56,4 +57,8 @@ dependencies {
 
     // ViewModel para Compose (Tema 5.5)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    // Room (Tema 5.7)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 }

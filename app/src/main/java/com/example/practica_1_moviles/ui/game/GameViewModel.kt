@@ -1,21 +1,27 @@
 package com.example.practica_1_moviles.ui.game
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.practica_1_moviles.data.Monster
 import com.example.practica_1_moviles.data.Question
+import com.example.practica_1_moviles.data.QuestionRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-enum class GameStatus { ANSWERING, FEEDBACK, VICTORY, DEFEAT }
+enum class GameStatus { LOADING, ANSWERING, FEEDBACK, VICTORY, DEFEAT }
 
-class GameViewModel : ViewModel() {
+class GameViewModel(
+    application: Application,
+    savedStateHandle: SavedStateHandle
+) : AndroidViewModel(application) {
 
     companion object {
         const val PLAYER_MAX_HP = 100
@@ -24,20 +30,22 @@ class GameViewModel : ViewModel() {
         const val TICK_MS = 100L
     }
 
-    // --- Datos del juego (de ejemplo, los cambiaremos con la temática) ---
+    // Temática elegida (llegará por la ruta en el siguiente paso).
+    // Si no viene ninguna, se juega con todas las preguntas mezcladas.
+    private val category: String = savedStateHandle["category"] ?: QuestionRepository.RANDOM
+
+    private val repository = QuestionRepository.create(application)
+
+    // --- Datos del juego ---
     private val monsters = listOf(
         Monster("Slime", maxHp = 60, damage = 15),
         Monster("Goblin", maxHp = 90, damage = 20),
         Monster("Dragón", maxHp = 150, damage = 30)
     )
-    private val questions = listOf(
-        Question("Pregunta de ejemplo 1 bladaidwbdhwbduwvduywduwdvwd", listOf("A", "B", "C", "D"), 0),
-        Question("Pregunta de ejemplo 2", listOf("A", "B", "C", "D"), 2),
-        Question("Pregunta de ejemplo 3", listOf("A", "B", "C", "D"), 1)
-    ).shuffled()
+    private var questions: List<Question> = emptyList()
 
     // --- Estado observable por la UI ---
-    var status by mutableStateOf(GameStatus.ANSWERING)
+    var status by mutableStateOf(GameStatus.LOADING)
         private set
     var playerHp by mutableIntStateOf(PLAYER_MAX_HP)
         private set
@@ -47,7 +55,7 @@ class GameViewModel : ViewModel() {
         private set
     var questionIndex by mutableIntStateOf(0)
         private set
-    var timeLeftMs by mutableLongStateOf(questions[0].timeLimitMs)
+    var timeLeftMs by mutableLongStateOf(0L)
         private set
     var selectedAnswer by mutableStateOf<Int?>(null)
         private set
@@ -61,7 +69,16 @@ class GameViewModel : ViewModel() {
 
     private var timerJob: Job? = null
 
-    init { startTimer() }
+    init { loadQuestions() }
+
+    // --- Carga de preguntas desde Room ---
+    private fun loadQuestions() {
+        viewModelScope.launch {
+            questions = repository.getQuestions(category)
+            status = GameStatus.ANSWERING
+            startTimer()
+        }
+    }
 
     // --- Temporizador ---
     private fun startTimer() {
