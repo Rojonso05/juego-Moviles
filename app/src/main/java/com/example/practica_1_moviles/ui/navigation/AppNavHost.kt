@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.practica_1_moviles.ui.category.CategoryScreen
 import com.example.practica_1_moviles.ui.game.GameScreen
 import com.example.practica_1_moviles.ui.home.HomeScreen
 import com.example.practica_1_moviles.ui.result.ResultScreen
@@ -21,10 +22,21 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         composable(Routes.HOME) {
-            HomeScreen(onPlay = { navController.navigate(Routes.GAME) })
+            HomeScreen(onPlay = { navController.navigate(Routes.CATEGORY) })
         }
 
-        composable(Routes.GAME) {
+        composable(Routes.CATEGORY) {
+            CategoryScreen(
+                onCategorySelected = { category ->
+                    navController.navigate(Routes.game(category))
+                }
+            )
+        }
+
+        composable(
+            route = Routes.GAME,
+            arguments = listOf(navArgument("category") { type = NavType.StringType })
+        ) {
             GameScreen(
                 onFinish = { victory ->
                     navController.navigate(Routes.result(victory)) {
@@ -42,7 +54,8 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             ResultScreen(
                 victory = victory,
                 onPlayAgain = {
-                    navController.navigate(Routes.GAME) { popUpTo(Routes.HOME) }
+                    // Volvemos a elegir temática
+                    navController.navigate(Routes.CATEGORY) { popUpTo(Routes.HOME) }
                 },
                 onHome = { navController.popBackStack(Routes.HOME, inclusive = false) }
             )
