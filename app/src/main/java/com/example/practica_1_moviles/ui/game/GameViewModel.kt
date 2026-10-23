@@ -15,6 +15,7 @@ import com.example.practica_1_moviles.data.QuestionRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import android.net.Uri
 
 enum class GameStatus { LOADING, ANSWERING, FEEDBACK, VICTORY, DEFEAT }
 
@@ -32,8 +33,9 @@ class GameViewModel(
 
     // Temática elegida (llegará por la ruta en el siguiente paso).
     // Si no viene ninguna, se juega con todas las preguntas mezcladas.
-    private val category: String = savedStateHandle["category"] ?: QuestionRepository.RANDOM
-
+    private val category: String =
+        savedStateHandle.get<String>("category")?.let { Uri.decode(it) }
+            ?: QuestionRepository.RANDOM
     private val repository = QuestionRepository.create(application)
 
     // --- Datos del juego ---
