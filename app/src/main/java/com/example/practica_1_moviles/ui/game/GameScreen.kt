@@ -39,12 +39,12 @@ private val Red = Color(0xFFF44336)
 @Composable
 fun GameScreen(
     viewModel: GameViewModel = viewModel(),
-    onFinish: (victory: Boolean) -> Unit = {}
+    onFinish: (victory: Boolean, score: Int) -> Unit = { _, _ -> }
 ) {
     LaunchedEffect(viewModel.status) {
         when (viewModel.status) {
-            GameStatus.VICTORY -> onFinish(true)
-            GameStatus.DEFEAT -> onFinish(false)
+            GameStatus.VICTORY -> onFinish(true, viewModel.finalScore)
+            GameStatus.DEFEAT -> onFinish(false, viewModel.finalScore)
             else -> {}
         }
     }
@@ -69,20 +69,31 @@ fun GameScreen(
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // ---------- FRANJA SUPERIOR: vida del jugador ----------
+        // ---------- FRANJA SUPERIOR: vida del jugador y puntos ----------
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            Text(
-                "Tu vida: ${viewModel.playerHp}/${GameViewModel.PLAYER_MAX_HP}",
-                color = Color.White
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "Tu vida: ${viewModel.playerHp}/${GameViewModel.PLAYER_MAX_HP}",
+                    color = Color.White
+                )
+                Text(
+                    "Puntos: ${viewModel.totalDamage}",
+                    color = Color.White
+                )
+            }
             LinearProgressIndicator(
                 progress = { viewModel.playerHp / GameViewModel.PLAYER_MAX_HP.toFloat() },
                 color = Green,
                 trackColor = Color.DarkGray,
+                gapSize = 0.dp,
+                drawStopIndicator = {},
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(12.dp)

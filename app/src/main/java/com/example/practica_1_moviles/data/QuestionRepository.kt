@@ -24,7 +24,7 @@ class QuestionRepository(private val dao: QuestionDao) {
     private suspend fun ensureSeeded() {
         seedMutex.withLock {
             if (!seeded) {
-                seedIfEmpty(dao)
+                seedQuestions(dao)
                 seeded = true
             }
         }

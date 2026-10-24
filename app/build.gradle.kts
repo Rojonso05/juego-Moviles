@@ -61,4 +61,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    // Iconos de Material (papelera del ranking)
+    implementation("androidx.compose.material:material-icons-core")
 }

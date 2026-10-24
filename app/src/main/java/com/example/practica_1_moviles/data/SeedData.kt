@@ -72,13 +72,14 @@ object SeedData {
         q(Categories.VIDEOJUEGOS, "¿De qué tipo es Pikachu?",
             "Eléctrico", "Fuego", "Agua", "Planta"),
         q(Categories.VIDEOJUEGOS, "¿En qué videojuego aparecen los Creepers?",
-            "Minecraft", "Terraria", "Fortnite", "Roblox")
+            "Minecraft", "Terraria", "Fortnite", "Roblox"),
+
     )
 }
 
-// Mete las preguntas iniciales solo si la base de datos está vacía
-suspend fun seedIfEmpty(dao: QuestionDao) {
-    if (dao.count() == 0) {
-        dao.insertAll(SeedData.questions)
-    }
+// Sustituye las preguntas de la base de datos por las de este archivo.
+// Se ejecuta una vez cada vez que arranca la app. No toca las puntuaciones.
+suspend fun seedQuestions(dao: QuestionDao) {
+    dao.deleteAll()
+    dao.insertAll(SeedData.questions)
 }
