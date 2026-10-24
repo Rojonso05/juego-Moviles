@@ -29,6 +29,8 @@ class GameViewModel(
         const val MIN_DAMAGE = 10
         const val MAX_DAMAGE = 50
         const val TICK_MS = 100L
+        const val HP_POINTS = 2
+        const val VICTORY_BONUS = 100
     }
 
     // Temática elegida (llegará por la ruta en el siguiente paso).
@@ -65,6 +67,16 @@ class GameViewModel(
         private set
     var lastDamageTaken by mutableIntStateOf(0)
         private set
+
+    // Daño total que has causado en la partida (puntos "en vivo")
+    var totalDamage by mutableIntStateOf(0)
+        private set
+
+    // Puntuación final: se consulta cuando la partida ha terminado
+    val finalScore: Int
+        get() = totalDamage +
+                playerHp * HP_POINTS +
+                if (status == GameStatus.VICTORY) VICTORY_BONUS else 0
 
     val currentMonster: Monster get() = monsters[monsterIndex]
     val currentQuestion: Question get() = questions[questionIndex % questions.size]
@@ -106,6 +118,7 @@ class GameViewModel(
             val damage = (MIN_DAMAGE + (MAX_DAMAGE - MIN_DAMAGE) * fraction).toInt()
             monsterHp = (monsterHp - damage).coerceAtLeast(0)
             lastDamageDealt = damage
+            totalDamage += damage
             lastDamageTaken = 0
         } else {
             hitPlayer()
