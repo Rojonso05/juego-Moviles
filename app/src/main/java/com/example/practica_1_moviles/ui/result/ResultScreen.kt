@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -20,22 +22,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.material3.LocalContentColor
-
-private const val MAX_NAME_LENGTH = 12
+import com.example.practica_1_moviles.data.Difficulty
+import com.example.practica_1_moviles.data.SettingsRepository
 
 @Composable
 fun ResultScreen(
     victory: Boolean,
     score: Int,
     category: String,
+    difficulty: String,
     onPlayAgain: () -> Unit,
     onHome: () -> Unit,
     onRanking: () -> Unit,
     viewModel: ResultViewModel = viewModel()
 ) {
-    // rememberSaveable: el nombre escrito sobrevive a la rotación
     var name by rememberSaveable { mutableStateOf("") }
+    // Marca que ya hemos rellenado el nombre por defecto, para hacerlo una sola vez
+    var prefilled by rememberSaveable { mutableStateOf(false) }
+
+    val defaultName = viewModel.defaultName
+    LaunchedEffect(defaultName) {
+        if (defaultName != null && !prefilled) {
+            name = defaultName
+            prefilled = true
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -52,12 +63,14 @@ fun ResultScreen(
             if (victory) "Has derrotado a todos los monstruos"
             else "Los monstruos han podido contigo"
         )
-        Text("Temática: $category")
+        Text("Temática: $category · ${Difficulty.fromName(difficulty).label}")
         Text("Puntuación: $score", style = MaterialTheme.typography.headlineMedium)
 
         OutlinedTextField(
             value = name,
-            onValueChange = { if (it.length <= MAX_NAME_LENGTH) name = it },
+            onValueChange = {
+                if (it.length <= SettingsRepository.MAX_NAME_LENGTH) name = it
+            },
             label = { Text("Tu nombre") },
             singleLine = true,
             enabled = !viewModel.saved,
@@ -73,7 +86,7 @@ fun ResultScreen(
         )
 
         Button(
-            onClick = { viewModel.saveScore(name, score, category, victory) },
+            onClick = { viewModel.saveScore(name, score, category, victory, difficulty) },
             enabled = name.isNotBlank() && !viewModel.saved,
             modifier = Modifier.fillMaxWidth()
         ) {

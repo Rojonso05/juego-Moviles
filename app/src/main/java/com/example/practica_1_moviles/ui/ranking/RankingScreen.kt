@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.practica_1_moviles.data.ScoreEntity
+import com.example.practica_1_moviles.data.Difficulty
 
 @Composable
 fun RankingScreen(
@@ -153,7 +154,8 @@ private fun ScoreRow(
             ) {
                 Text(score.playerName, style = MaterialTheme.typography.titleMedium)
                 Text(
-                    "${score.category} · ${if (score.victory) "Victoria" else "Derrota"}",
+                    "${score.category} · ${Difficulty.fromName(score.difficulty).label} · " +
+                            if (score.victory) "Victoria" else "Derrota",
                     style = MaterialTheme.typography.bodySmall
                 )
             }

@@ -6,8 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [QuestionEntity::class, ScoreEntity::class],
-    version = 4,
+    entities = [QuestionEntity::class, ScoreEntity::class, SettingsEntity::class],
+    version = 5,
     exportSchema = false
 )
 abstract class QuestionDatabase : RoomDatabase() {
@@ -15,6 +15,9 @@ abstract class QuestionDatabase : RoomDatabase() {
     abstract fun questionDao(): QuestionDao
 
     abstract fun scoreDao(): ScoreDao
+
+
+    abstract fun settingsDao(): SettingsDao
 
     companion object {
         @Volatile
