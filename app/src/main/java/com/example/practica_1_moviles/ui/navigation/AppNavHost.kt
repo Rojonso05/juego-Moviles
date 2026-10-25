@@ -11,8 +11,9 @@ import androidx.navigation.navArgument
 import com.example.practica_1_moviles.ui.category.CategoryScreen
 import com.example.practica_1_moviles.ui.game.GameScreen
 import com.example.practica_1_moviles.ui.home.HomeScreen
-import com.example.practica_1_moviles.ui.result.ResultScreen
 import com.example.practica_1_moviles.ui.ranking.RankingScreen
+import com.example.practica_1_moviles.ui.result.ResultScreen
+import com.example.practica_1_moviles.ui.settings.SettingsScreen
 
 @Composable
 fun AppNavHost(modifier: Modifier = Modifier) {
@@ -26,7 +27,8 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         composable(Routes.HOME) {
             HomeScreen(
                 onPlay = { navController.navigate(Routes.CATEGORY) },
-                onRanking = { navController.navigate(Routes.RANKING) }
+                onRanking = { navController.navigate(Routes.RANKING) },
+                onSettings = { navController.navigate(Routes.SETTINGS) }
             )
         }
 
@@ -42,15 +44,18 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             RankingScreen(onBack = { navController.popBackStack() })
         }
 
+        composable(Routes.SETTINGS) {
+            SettingsScreen(onBack = { navController.popBackStack() })
+        }
+
         composable(
             route = Routes.GAME,
             arguments = listOf(navArgument("category") { type = NavType.StringType })
         ) { entry ->
-            // Temática de esta partida, para pasarla al resultado
             val category = Uri.decode(entry.arguments?.getString("category") ?: "")
             GameScreen(
-                onFinish = { victory, score ->
-                    navController.navigate(Routes.result(victory, score, category)) {
+                onFinish = { victory, score, difficulty ->
+                    navController.navigate(Routes.result(victory, score, category, difficulty)) {
                         popUpTo(Routes.HOME)
                     }
                 }
@@ -62,16 +67,19 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             arguments = listOf(
                 navArgument("victory") { type = NavType.BoolType },
                 navArgument("score") { type = NavType.IntType },
-                navArgument("category") { type = NavType.StringType }
+                navArgument("category") { type = NavType.StringType },
+                navArgument("difficulty") { type = NavType.StringType }
             )
         ) { entry ->
             val victory = entry.arguments?.getBoolean("victory") ?: false
             val score = entry.arguments?.getInt("score") ?: 0
             val category = Uri.decode(entry.arguments?.getString("category") ?: "")
+            val difficulty = entry.arguments?.getString("difficulty") ?: ""
             ResultScreen(
                 victory = victory,
                 score = score,
                 category = category,
+                difficulty = difficulty,
                 onPlayAgain = {
                     navController.navigate(Routes.CATEGORY) { popUpTo(Routes.HOME) }
                 },

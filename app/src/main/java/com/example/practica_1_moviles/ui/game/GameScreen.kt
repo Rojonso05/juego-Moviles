@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.CircularProgressIndicator
+import com.example.practica_1_moviles.data.Difficulty
 
 private val CardDark = Color(0xFF2B2420)
 private val Green = Color(0xFF4CAF50)
@@ -39,12 +40,12 @@ private val Red = Color(0xFFF44336)
 @Composable
 fun GameScreen(
     viewModel: GameViewModel = viewModel(),
-    onFinish: (victory: Boolean, score: Int) -> Unit = { _, _ -> }
+    onFinish: (victory: Boolean, score: Int, difficulty: Difficulty) -> Unit = { _, _, _ -> }
 ) {
     LaunchedEffect(viewModel.status) {
         when (viewModel.status) {
-            GameStatus.VICTORY -> onFinish(true, viewModel.finalScore)
-            GameStatus.DEFEAT -> onFinish(false, viewModel.finalScore)
+            GameStatus.VICTORY -> onFinish(true, viewModel.finalScore, viewModel.difficulty)
+            GameStatus.DEFEAT -> onFinish(false, viewModel.finalScore, viewModel.difficulty)
             else -> {}
         }
     }
@@ -84,7 +85,7 @@ fun GameScreen(
                     color = Color.White
                 )
                 Text(
-                    "Puntos: ${viewModel.totalDamage}",
+                    "Puntos: ${viewModel.liveScore}",
                     color = Color.White
                 )
             }
@@ -147,7 +148,7 @@ fun GameScreen(
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             LinearProgressIndicator(
-                progress = { viewModel.timeLeftMs / question.timeLimitMs.toFloat() },
+                progress = { viewModel.timeLeftMs / viewModel.timeLimitMs.toFloat() },
                 trackColor = Color.DarkGray,
                 modifier = Modifier.fillMaxWidth()
             )

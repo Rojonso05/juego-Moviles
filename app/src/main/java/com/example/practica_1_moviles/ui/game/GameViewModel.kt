@@ -1,6 +1,7 @@
 package com.example.practica_1_moviles.ui.game
 
 import android.app.Application
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -9,13 +10,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.example.practica_1_moviles.data.Difficulty
 import com.example.practica_1_moviles.data.Monster
 import com.example.practica_1_moviles.data.Question
 import com.example.practica_1_moviles.data.QuestionRepository
+import com.example.practica_1_moviles.data.SettingsRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import android.net.Uri
+import kotlin.math.roundToInt
 
 enum class GameStatus { LOADING, ANSWERING, FEEDBACK, VICTORY, DEFEAT }
 
@@ -33,12 +36,12 @@ class GameViewModel(
         const val VICTORY_BONUS = 100
     }
 
-    // Temática elegida (llegará por la ruta en el siguiente paso).
-    // Si no viene ninguna, se juega con todas las preguntas mezcladas.
     private val category: String =
         savedStateHandle.get<String>("category")?.let { Uri.decode(it) }
             ?: QuestionRepository.RANDOM
+
     private val repository = QuestionRepository.create(application)
+    private val settingsRepository = SettingsRepository.create(application)   // NUEVO
 
     // --- Datos del juego ---
     private val monsters = listOf(
@@ -67,27 +70,40 @@ class GameViewModel(
         private set
     var lastDamageTaken by mutableIntStateOf(0)
         private set
-
-    // Daño total que has causado en la partida (puntos "en vivo")
     var totalDamage by mutableIntStateOf(0)
         private set
 
-    // Puntuación final: se consulta cuando la partida ha terminado
+    // NUEVO: dificultad de esta partida (se lee de los ajustes al empezar)
+    var difficulty by mutableStateOf(Difficulty.NORMAL)
+        private set
+
+    // NUEVO: tiempo por pregunta según la dificultad
+    val timeLimitMs: Long get() = difficulty.timeLimitMs
+
+    // NUEVO: puntos que se ven durante la partida (daño × multiplicador)
+    val liveScore: Int
+        get() = (totalDamage * difficulty.multiplier).roundToInt()
+
+    // NUEVO: puntuación final con multiplicador
     val finalScore: Int
-        get() = totalDamage +
-                playerHp * HP_POINTS +
-                if (status == GameStatus.VICTORY) VICTORY_BONUS else 0
+        get() {
+            val base = totalDamage +
+                    playerHp * HP_POINTS +
+                    if (status == GameStatus.VICTORY) VICTORY_BONUS else 0
+            return (base * difficulty.multiplier).roundToInt()
+        }
 
     val currentMonster: Monster get() = monsters[monsterIndex]
     val currentQuestion: Question get() = questions[questionIndex % questions.size]
 
     private var timerJob: Job? = null
 
-    init { loadQuestions() }
+    init { loadGame() }
 
-    // --- Carga de preguntas desde Room ---
-    private fun loadQuestions() {
+    // --- Carga de ajustes y preguntas desde Room ---
+    private fun loadGame() {
         viewModelScope.launch {
+            difficulty = Difficulty.fromName(settingsRepository.get().difficulty)
             questions = repository.getQuestions(category)
             status = GameStatus.ANSWERING
             startTimer()
@@ -97,7 +113,7 @@ class GameViewModel(
     // --- Temporizador ---
     private fun startTimer() {
         timerJob?.cancel()
-        timeLeftMs = currentQuestion.timeLimitMs
+        timeLeftMs = timeLimitMs
         timerJob = viewModelScope.launch {
             while (timeLeftMs > 0) {
                 delay(TICK_MS)
@@ -114,7 +130,7 @@ class GameViewModel(
         selectedAnswer = index
 
         if (index == currentQuestion.correctIndex) {
-            val fraction = timeLeftMs.toFloat() / currentQuestion.timeLimitMs
+            val fraction = timeLeftMs.toFloat() / timeLimitMs
             val damage = (MIN_DAMAGE + (MAX_DAMAGE - MIN_DAMAGE) * fraction).toInt()
             monsterHp = (monsterHp - damage).coerceAtLeast(0)
             lastDamageDealt = damage

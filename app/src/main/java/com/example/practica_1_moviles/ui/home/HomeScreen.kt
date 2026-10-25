@@ -16,7 +16,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HomeScreen(
     onPlay: () -> Unit,
-    onRanking: () -> Unit
+    onRanking: () -> Unit,
+    onSettings: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -29,5 +30,6 @@ fun HomeScreen(
         Text("Responde rápido para derrotar a los monstruos")
         Button(onClick = onPlay) { Text("Jugar") }
         OutlinedButton(onClick = onRanking) { Text("Ranking") }
+        OutlinedButton(onClick = onSettings) { Text("Ajustes") }
     }
 }

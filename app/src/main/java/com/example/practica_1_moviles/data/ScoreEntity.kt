@@ -10,5 +10,6 @@ data class ScoreEntity(
     val points: Int,
     val category: String,
     val victory: Boolean,
+    val difficulty: String = Difficulty.NORMAL.name,
     val timestamp: Long = System.currentTimeMillis()
 )
