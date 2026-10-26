@@ -20,7 +20,7 @@ class QuestionRepository(private val dao: QuestionDao) {
             QuestionRepository(QuestionDatabase.getDatabase(context).questionDao())
     }
 
-    // Carga las preguntas iniciales una sola vez (y solo si la tabla está vacía)
+    // Carga las preguntas iniciales una sola vez y solo si la tabla está vacía
     private suspend fun ensureSeeded() {
         seedMutex.withLock {
             if (!seeded) {
@@ -40,7 +40,7 @@ class QuestionRepository(private val dao: QuestionDao) {
         return rows.map { it.toQuestion() }
     }
 
-    // Temáticas disponibles (para la pantalla de selección del siguiente paso)
+    // Temáticas disponibles
     fun getCategories(): Flow<List<String>> = flow {
         ensureSeeded()
         emitAll(dao.getCategories())

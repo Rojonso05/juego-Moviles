@@ -15,7 +15,7 @@ class SettingsRepository(private val dao: SettingsDao) {
             SettingsRepository(QuestionDatabase.getDatabase(context).settingsDao())
     }
 
-    // Evita que dos cambios seguidos (por ejemplo, al teclear el nombre) se pisen
+    // Evita que dos cambios seguidos se pisen
     private val writeMutex = Mutex()
 
     // Ajustes actuales. Si aún no se ha guardado nada, devuelve los valores por defecto

@@ -37,7 +37,7 @@ fun ResultScreen(
     viewModel: ResultViewModel = viewModel()
 ) {
     var name by rememberSaveable { mutableStateOf("") }
-    // Marca que ya hemos rellenado el nombre por defecto, para hacerlo una sola vez
+    // Marca que ya se ha rellenado el nombre por defecto, para hacerlo una sola vez
     var prefilled by rememberSaveable { mutableStateOf(false) }
 
     val defaultName = viewModel.defaultName

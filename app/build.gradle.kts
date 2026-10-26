@@ -52,16 +52,16 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    // Navegación (Tema 5.6)
+    // Navegación
     implementation("androidx.navigation:navigation-compose:2.8.9")
 
-    // ViewModel para Compose (Tema 5.5)
+    // ViewModel para Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-    // Room (Tema 5.7)
+    // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Iconos de Material (papelera del ranking)
+    // Iconos de Material
     implementation("androidx.compose.material:material-icons-core")
 }

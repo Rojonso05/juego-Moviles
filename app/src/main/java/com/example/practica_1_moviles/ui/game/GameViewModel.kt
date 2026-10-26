@@ -73,18 +73,18 @@ class GameViewModel(
     var totalDamage by mutableIntStateOf(0)
         private set
 
-    // NUEVO: dificultad de esta partida (se lee de los ajustes al empezar)
+    // Dificultad de esta partida
     var difficulty by mutableStateOf(Difficulty.NORMAL)
         private set
 
-    // NUEVO: tiempo por pregunta según la dificultad
+    // Tiempo por pregunta según la dificultad
     val timeLimitMs: Long get() = difficulty.timeLimitMs
 
-    // NUEVO: puntos que se ven durante la partida (daño × multiplicador)
+    // Puntos que se ven durante la partida
     val liveScore: Int
         get() = (totalDamage * difficulty.multiplier).roundToInt()
 
-    // NUEVO: puntuación final con multiplicador
+    // Puntuación final con multiplicador
     val finalScore: Int
         get() {
             val base = totalDamage +

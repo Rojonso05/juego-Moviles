@@ -3,8 +3,7 @@ package com.example.practica_1_moviles.data
 // ---------------------------------------------------------------
 //  PREGUNTAS DEL JUEGO
 //  Formato:  q("temática", "pregunta", "correcta", "mala1", "mala2", "mala3")
-//  Escribe SIEMPRE la respuesta correcta primero: el orden de las
-//  4 respuestas se mezcla solo.
+//  La respuesta correcta primero: el orden de las 4 respuestas se mezcla solo.
 //  Temática nueva = escribir un nombre nuevo en el primer campo.
 // ---------------------------------------------------------------
 
@@ -85,7 +84,7 @@ object SeedData {
             "Cerbero", "Fenrir", "Anubis", "Argos"),
         q(Categories.MONSTRUOS, "¿Qué criatura, mitad hombre y mitad toro, habitaba el laberinto de Creta?",
             "Minotauro", "Centauro", "Sátiro", "Cíclope"),
-        q(Categories.MONSTRUOS, "¿Cómo se llama el gigantesco monstruo marino del folclore escandinavo que hunde barcos?",
+        q(Categories.MONSTRUOS, "¿Cómo se llama el monstruo marino escandinavo que hunde barcos?",
             "Kraken", "Leviatán", "Caribdis", "Nessie"),
         q(Categories.MONSTRUOS, "¿Qué cíclope se enfrenta a Ulises en La Odisea?",
             "Polifemo", "Caribdis", "Argos", "Talos"),
@@ -99,7 +98,7 @@ object SeedData {
             "Hércules", "Perseo", "Teseo", "Aquiles"),
         q(Categories.MONSTRUOS, "¿Qué criatura mitológica tiene cuerpo de león y cabeza y alas de águila?",
             "Grifo", "Quimera", "Hipogrifo", "Mantícora"),
-        q(Categories.MONSTRUOS, "¿Qué criatura del folclore latinoamericano ataca al ganado y le chupa la sangre?",
+        q(Categories.MONSTRUOS, "¿Qué criatura latinoamericana ataca al ganado y le chupa la sangre?",
             "Chupacabras", "Cadejo", "Nahual", "La Llorona"),
 
         // ----- Videojuegos -----
