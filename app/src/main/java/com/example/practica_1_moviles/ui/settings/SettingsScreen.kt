@@ -1,24 +1,18 @@
 package com.example.practica_1_moviles.ui.settings
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,16 +21,64 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.practica_1_moviles.R
 import com.example.practica_1_moviles.data.Difficulty
 import com.example.practica_1_moviles.data.SettingsEntity
 import com.example.practica_1_moviles.data.SettingsRepository
 
+// ---------------------------------------------------------------
+//  PANTALLA DE AJUSTES
+//  Ilustración de 1880 x 4072 con el título, las etiquetas, el marco del nombre,
+//  las tres casillas de dificultad y la casilla de sonido ya dibujados. Encima se
+//  colocan el campo de texto, los rellenos de «seleccionado» y las zonas pulsables,
+//  como fracciones del dibujo.
+// ---------------------------------------------------------------
+private const val SETTINGS_ASPECT = 1880f / 4072f
+
+// Marco del nombre
+private const val NAME_X = 0.1532f
+private const val NAME_Y = 0.2809f
+private const val NAME_W = 0.7016f
+private const val NAME_H = 0.0685f
+
+// Casillas (cuadrado dibujado) y fila pulsable de cada opción
+private const val BOX_X = 0.1528f
+private const val BOX_W = 0.0715f
+private const val BOX_H = 0.0290f
+private const val ROW_X = 0.1400f
+private const val ROW_W = 0.5000f
+private const val ROW_H = 0.0480f
+
+private val EASY_Y = 0.4242f
+private val NORMAL_Y = 0.4887f
+private val HARD_Y = 0.5538f
+private val SOUND_Y = 0.6683f
+private const val SOUND_BOX_W = 0.1105f
+
+private val PixelGreen = Color(0xFF4CAF50)
+
+private fun Modifier.region(
+    parentW: Dp, parentH: Dp,
+    x: Float, y: Float, w: Float, h: Float
+): Modifier = this
+    .offset(x = parentW * x, y = parentH * y)
+    .size(width = parentW * w, height = parentH * h)
+
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit,
     viewModel: SettingsViewModel = viewModel()
 ) {
     val settings by viewModel.settings.collectAsState()
@@ -54,8 +96,7 @@ fun SettingsScreen(
         settings = current,
         onNameChange = viewModel::setPlayerName,
         onDifficultyChange = viewModel::setDifficulty,
-        onSoundChange = viewModel::setSoundEnabled,
-        onBack = onBack
+        onSoundChange = viewModel::setSoundEnabled
     )
 }
 
@@ -64,82 +105,99 @@ private fun SettingsContent(
     settings: SettingsEntity,
     onNameChange: (String) -> Unit,
     onDifficultyChange: (Difficulty) -> Unit,
-    onSoundChange: (Boolean) -> Unit,
-    onBack: () -> Unit
+    onSoundChange: (Boolean) -> Unit
 ) {
     // El nombre se edita en un estado local y se guarda en Room a la vez.
     // Solo se inicializa con el valor guardado.
     var name by rememberSaveable { mutableStateOf(settings.playerName) }
     val difficulty = Difficulty.fromName(settings.difficulty)
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+            .background(Color.Black),
+        contentAlignment = Alignment.Center
     ) {
-        Text("Ajustes", style = MaterialTheme.typography.headlineMedium)
+        BoxWithConstraints(modifier = Modifier.aspectRatio(SETTINGS_ASPECT)) {
+            val w = maxWidth
+            val h = maxHeight
 
-        // ---------- Nombre por defecto ----------
-        Text("Nombre de jugador", style = MaterialTheme.typography.titleMedium)
-        OutlinedTextField(
-            value = name,
-            onValueChange = {
-                if (it.length <= SettingsRepository.MAX_NAME_LENGTH) {
-                    name = it
-                    onNameChange(it)
-                }
-            },
-            label = { Text("Nombre por defecto") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
+            Image(
+                bitmap = ImageBitmap.imageResource(R.drawable.pantalla_ajustes),
+                contentDescription = "Ajustes",
+                contentScale = ContentScale.FillBounds,
+                filterQuality = FilterQuality.None,
+                modifier = Modifier.fillMaxSize()
+            )
 
-        // ---------- Dificultad ----------
-        Text("Dificultad", style = MaterialTheme.typography.titleMedium)
-        Column {
-            Difficulty.entries.forEach { option ->
-                Row(
+            // ---------- Nombre por defecto ----------
+            Box(
+                modifier = Modifier
+                    .region(w, h, NAME_X, NAME_Y, NAME_W, NAME_H)
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                BasicTextField(
+                    value = name,
+                    onValueChange = {
+                        if (it.length <= SettingsRepository.MAX_NAME_LENGTH) {
+                            name = it
+                            onNameChange(it)
+                        }
+                    },
+                    singleLine = true,
+                    textStyle = TextStyle(
+                        color = Color.White,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 18.sp
+                    ),
+                    cursorBrush = SolidColor(Color.White),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            // ---------- Dificultad ----------
+            DifficultyOption(w, h, EASY_Y, Difficulty.EASY, difficulty, onDifficultyChange)
+            DifficultyOption(w, h, NORMAL_Y, Difficulty.NORMAL, difficulty, onDifficultyChange)
+            DifficultyOption(w, h, HARD_Y, Difficulty.HARD, difficulty, onDifficultyChange)
+
+            // ---------- Sonido ----------
+            Box(
+                modifier = Modifier
+                    .region(w, h, ROW_X, SOUND_Y - 0.0095f, ROW_W, ROW_H)
+                    .clickable(role = Role.Switch) { onSoundChange(!settings.soundEnabled) }
+            )
+            if (settings.soundEnabled) {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = option == difficulty,
-                            onClick = { onDifficultyChange(option) },
-                            role = Role.RadioButton
-                        )
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(selected = option == difficulty, onClick = null)
-                    Column(modifier = Modifier.padding(start = 12.dp)) {
-                        Text(option.label)
-                        Text(
-                            "${option.timeLimitMs / 1000} s por pregunta · puntos ×${option.multiplier}",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                }
+                        .region(w, h, BOX_X, SOUND_Y, SOUND_BOX_W, BOX_H)
+                        .padding(4.dp)
+                        .background(PixelGreen)
+                )
             }
         }
+    }
+}
 
-        // ---------- Sonido ----------
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Sonido", style = MaterialTheme.typography.titleMedium)
-            Switch(
-                checked = settings.soundEnabled,
-                onCheckedChange = onSoundChange
-            )
-        }
-
-        Spacer(Modifier.height(8.dp))
-
-        Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) {
-            Text("Volver")
-        }
+// Casilla de una dificultad: zona pulsable y, si está elegida, relleno verde en la casilla
+@Composable
+private fun DifficultyOption(
+    w: Dp, h: Dp, y: Float,
+    option: Difficulty,
+    selected: Difficulty,
+    onSelect: (Difficulty) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .region(w, h, ROW_X, y - 0.0095f, ROW_W, ROW_H)
+            .clickable(role = Role.RadioButton) { onSelect(option) }
+    )
+    if (option == selected) {
+        Box(
+            modifier = Modifier
+                .region(w, h, BOX_X, y, BOX_W, BOX_H)
+                .padding(4.dp)
+                .background(PixelGreen)
+        )
     }
 }

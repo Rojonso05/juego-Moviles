@@ -3,12 +3,14 @@ package com.example.practica_1_moviles.ui.navigation
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.practica_1_moviles.ui.category.CategoryScreen
+import com.example.practica_1_moviles.ui.components.ScreenWithBack
 import com.example.practica_1_moviles.ui.game.GameScreen
 import com.example.practica_1_moviles.ui.home.HomeScreen
 import com.example.practica_1_moviles.ui.ranking.RankingScreen
@@ -33,19 +35,26 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         }
 
         composable(Routes.CATEGORY) {
-            CategoryScreen(
-                onCategorySelected = { category ->
-                    navController.navigate(Routes.game(category))
-                }
-            )
+            ScreenWithBack(onBack = { navController.popBackStack() }) {
+                CategoryScreen(
+                    onCategorySelected = { category ->
+                        navController.navigate(Routes.game(category))
+                    }
+                )
+            }
         }
 
         composable(Routes.RANKING) {
-            RankingScreen(onBack = { navController.popBackStack() })
+            ScreenWithBack(onBack = { navController.popBackStack() }) {
+                RankingScreen(onBack = { navController.popBackStack() })
+            }
         }
 
         composable(Routes.SETTINGS) {
-            SettingsScreen(onBack = { navController.popBackStack() })
+            // Ajustes es una ilustración a pantalla completa: la flecha va encima
+            ScreenWithBack(onBack = { navController.popBackStack() }, topPadding = 0.dp) {
+                SettingsScreen()
+            }
         }
 
         composable(
@@ -75,17 +84,22 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             val score = entry.arguments?.getInt("score") ?: 0
             val category = Uri.decode(entry.arguments?.getString("category") ?: "")
             val difficulty = entry.arguments?.getString("difficulty") ?: ""
-            ResultScreen(
-                victory = victory,
-                score = score,
-                category = category,
-                difficulty = difficulty,
-                onPlayAgain = {
-                    navController.navigate(Routes.CATEGORY) { popUpTo(Routes.HOME) }
-                },
-                onHome = { navController.popBackStack(Routes.HOME, inclusive = false) },
-                onRanking = { navController.navigate(Routes.RANKING) }
-            )
+            val goHome = { navController.popBackStack(Routes.HOME, inclusive = false); Unit }
+            // La victoria es una ilustración a pantalla completa: el botón de volver
+            // va encima, sin bajar el contenido. La derrota usa el diseño normal.
+            ScreenWithBack(onBack = goHome, topPadding = if (victory) 0.dp else 56.dp) {
+                ResultScreen(
+                    victory = victory,
+                    score = score,
+                    category = category,
+                    difficulty = difficulty,
+                    onPlayAgain = {
+                        navController.navigate(Routes.CATEGORY) { popUpTo(Routes.HOME) }
+                    },
+                    onHome = goHome,
+                    onRanking = { navController.navigate(Routes.RANKING) }
+                )
+            }
         }
     }
 }

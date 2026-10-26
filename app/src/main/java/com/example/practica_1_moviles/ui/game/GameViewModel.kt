@@ -45,9 +45,9 @@ class GameViewModel(
 
     // --- Datos del juego ---
     private val monsters = listOf(
-        Monster("Slime", maxHp = 60, damage = 15),
-        Monster("Goblin", maxHp = 90, damage = 20),
-        Monster("Dragón", maxHp = 150, damage = 30)
+        Monster("Slimer", maxHp = 60, damage = 15),
+        Monster("Grim", maxHp = 90, damage = 20),
+        Monster("Groptrop", maxHp = 150, damage = 30)
     )
     private var questions: List<Question> = emptyList()
 
