@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "questions")
 data class QuestionEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val category: String,          // "general", "monstruos", "videojuegos"...
+    val category: String,          // cultura general, monstruos, videojuegos, al azar
     val text: String,
     val answer1: String,
     val answer2: String,
@@ -16,10 +16,15 @@ data class QuestionEntity(
     val timeLimitMs: Long = 10_000L
 ) {
     // Convierte la fila de la base de datos en la Question que ya usa el juego
-    fun toQuestion() = Question(
-        text = text,
-        answers = listOf(answer1, answer2, answer3, answer4),
-        correctIndex = correctIndex,
-        timeLimitMs = timeLimitMs
-    )
+    fun toQuestion(): Question {
+        val answers = listOf(answer1, answer2, answer3, answer4)
+        val correct = answers[correctIndex]
+        val shuffled = answers.shuffled()
+        return Question(
+            text = text,
+            answers = shuffled,
+            correctIndex = shuffled.indexOf(correct),
+            timeLimitMs = timeLimitMs
+        )
+    }
 }

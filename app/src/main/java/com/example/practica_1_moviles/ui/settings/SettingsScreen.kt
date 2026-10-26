@@ -42,7 +42,7 @@ fun SettingsScreen(
     val settings by viewModel.settings.collectAsState()
     val current = settings
 
-    // Hasta que Room entregue los ajustes guardados, mostramos una rueda de carga
+    // Hasta que Room entregue los ajustes guardados, muestra una rueda de carga
     if (current == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -67,8 +67,8 @@ private fun SettingsContent(
     onSoundChange: (Boolean) -> Unit,
     onBack: () -> Unit
 ) {
-    // El nombre se edita en un estado local (para que el cursor no salte)
-    // y se guarda en Room a la vez. Solo se inicializa con el valor guardado.
+    // El nombre se edita en un estado local y se guarda en Room a la vez.
+    // Solo se inicializa con el valor guardado.
     var name by rememberSaveable { mutableStateOf(settings.playerName) }
     val difficulty = Difficulty.fromName(settings.difficulty)
 

@@ -15,11 +15,11 @@ interface QuestionDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(questions: List<QuestionEntity>)
 
-    // Preguntas de una temática, ya mezcladas
+    // Preguntas de una temática ya mezcladas
     @Query("SELECT * FROM questions WHERE category = :category ORDER BY RANDOM()")
     suspend fun getByCategory(category: String): List<QuestionEntity>
 
-    // Todas las preguntas mezcladas (temática "Al azar")
+    // Todas las preguntas mezcladas (temática Al azar)
     @Query("SELECT * FROM questions ORDER BY RANDOM()")
     suspend fun getAllRandom(): List<QuestionEntity>
 

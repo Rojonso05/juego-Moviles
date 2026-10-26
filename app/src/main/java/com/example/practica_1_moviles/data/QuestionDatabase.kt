@@ -23,7 +23,7 @@ abstract class QuestionDatabase : RoomDatabase() {
         @Volatile
         private var Instance: QuestionDatabase? = null
 
-        // Una única instancia para toda la app (Singleton)
+        // Una única instancia para toda la app
         fun getDatabase(context: Context): QuestionDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(

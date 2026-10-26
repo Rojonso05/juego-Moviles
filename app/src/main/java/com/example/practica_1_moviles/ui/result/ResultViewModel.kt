@@ -16,7 +16,7 @@ class ResultViewModel(application: Application) : AndroidViewModel(application) 
     private val scoreDao = QuestionDatabase.getDatabase(application).scoreDao()
     private val settingsRepository = SettingsRepository.create(application)
 
-    // Evita guardar la misma partida dos veces (también tras rotar la pantalla)
+    // Evita guardar la misma partida dos veces
     var saved by mutableStateOf(false)
         private set
 

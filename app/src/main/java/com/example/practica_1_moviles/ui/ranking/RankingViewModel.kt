@@ -14,7 +14,7 @@ class RankingViewModel(application: Application) : AndroidViewModel(application)
 
     private val dao = QuestionDatabase.getDatabase(application).scoreDao()
 
-    // Top 10 como StateFlow, igual que las temáticas
+    // Top 10 como StateFlow
     val scores: StateFlow<List<ScoreEntity>> = dao.getTopScores()
         .stateIn(
             scope = viewModelScope,

@@ -36,7 +36,7 @@ fun CategoryScreen(
     ) {
         Text("Elige una temática", style = MaterialTheme.typography.headlineMedium)
 
-        // Una lista por si algún día hay muchas temáticas
+        // Una lista por si hay muchas temáticas
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -51,7 +51,7 @@ fun CategoryScreen(
             }
         }
 
-        // Temática especial: mezcla todas
+        // Temática: mezcla todas
         OutlinedButton(
             onClick = { onCategorySelected(QuestionRepository.RANDOM) },
             modifier = Modifier.fillMaxWidth()

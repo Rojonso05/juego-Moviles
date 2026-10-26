@@ -12,8 +12,7 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
 
     private val repository = QuestionRepository.create(application)
 
-    // Lista de temáticas que hay en la base de datos.
-    // Es lo mismo que en HomeViewModel de Inventory: un Flow convertido en StateFlow.
+    // Lista de temáticas que hay en la base de datos
     val categories: StateFlow<List<String>> = repository.getCategories()
         .stateIn(
             scope = viewModelScope,
